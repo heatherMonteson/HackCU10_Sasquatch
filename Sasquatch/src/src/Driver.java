@@ -17,6 +17,12 @@ public class Driver extends Canvas implements Runnable{
 
     public Driver(){
         new Window(WIDTH, Height,"Sass the Quatche's Berry Bad Day", this);
+        try {
+            backgroundImage = ImageIO.read(getClass().getResource("Images/background"));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         manager=new Manager();
         manager.addObject(new Sasquatch(WIDTH/2, Height/2));
         manager.addObject(new Berries(200, 200));
