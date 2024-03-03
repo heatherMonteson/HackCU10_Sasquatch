@@ -1,6 +1,7 @@
 import java.awt.*;
 
 public class Tree extends GameObject{
+    Image tree = Toolkit.getDefaultToolkit().getImage("Images/tree.png");
 
     public Tree(int xPos, int yPos) {
         super(xPos, yPos, Enums.Sprite.Tree);
@@ -12,7 +13,7 @@ public class Tree extends GameObject{
     }
 
     @Override
-    public void render(Graphics2D g)  {
-
+    public void render(Graphics g)  {
+        g.drawImage(tree, xPos,yPos,450, 650, null);
     }
 }

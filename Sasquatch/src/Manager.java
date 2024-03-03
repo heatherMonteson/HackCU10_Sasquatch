@@ -21,7 +21,7 @@ public class Manager {
             temp.tick();
         }
     }
-
+    public LinkedList<GameObject> getObjects(){return gameObjects; }
     public void addObject(GameObject object){
         this.gameObjects.add((object));
     }

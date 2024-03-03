@@ -1,8 +1,10 @@
 import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.Serial;
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.util.Objects;
 
 public class Driver extends Canvas implements Runnable{
 
@@ -11,16 +13,38 @@ public class Driver extends Canvas implements Runnable{
     public static final int WIDTH = 1200, Height=WIDTH/12*8;
     private Thread thread;
     private boolean running=false;
-    private Manager manager;
-    private Image backgroundImage; // Image for the background
-
+    public static Manager manager;
+    private Background bg;
+    private KeyInput keyInput;
+    private Sasquatch sasquatch;
+    private Photographer photographer;
+    private int count;
+    public boolean pic;
 
     public Driver(){
-        new Window(WIDTH, Height,"Sass the Quatche's Berry Bad Day", this);
+        new Window(WIDTH, Height,"Sass the Quatch's Berry Bad Day", this);
+        pic=false;
+        count=0;
         manager=new Manager();
-        manager.addObject(new Sasquatch(WIDTH/2, Height/2));
-        manager.addObject(new Berries(200, 200));
-        manager.addObject(new Berries(0, 100));
+
+        manager.addObject(new Background(5, 90));
+
+        manager.addObject(new BushL(5, 90));
+        manager.addObject(new BushR(500, 90));
+        manager.addObject(new BushR(-400, 90));
+        manager.addObject(new BushL(200, 90));
+
+        manager.addObject(new Tree(-5, 60));
+        manager.addObject(new Tree(745, 60));
+
+
+
+        sasquatch=new Sasquatch(250, 325);
+
+        manager.addObject(sasquatch);
+        keyInput = new KeyInput(sasquatch);
+        this.addKeyListener(keyInput);
+        this.setFocusable(true);
     }
 
     public synchronized void start(){
@@ -38,8 +62,29 @@ public class Driver extends Canvas implements Runnable{
         }
     }
 
-    private void tick(){
-     manager.tick();
+    private void tick() {
+        count++;
+        manager.tick();
+
+        // Check for collision between berries and photographer
+        for (GameObject obj : manager.getObjects()) {
+            if (obj instanceof Berries) {
+                for (GameObject obj2 : manager.getObjects()) {
+                    if (obj2 instanceof Photographer) {
+                        if (((Berries) obj).getBounds().intersects(((Photographer) obj2).getBounds())) {
+
+                            manager.removeObject(obj2);
+                            manager.removeObject(obj);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (count % 297 == 0) {
+            manager.addObject(new Photographer(1000, 250));
+        }
     }
 
     public void render(){
@@ -51,12 +96,9 @@ public class Driver extends Canvas implements Runnable{
         }
 
         Graphics2D graphics = (Graphics2D) buffer.getDrawGraphics();
-        graphics.drawImage(backgroundImage, 0, 0, WIDTH, HEIGHT, null);
-
-        graphics.setColor(Color.green);
         graphics.fillRect(0,0,WIDTH, Height);
-        manager.render(graphics);
 
+        manager.render(graphics);
         graphics.dispose();
         buffer.show();
     }
